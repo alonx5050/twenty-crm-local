@@ -4,145 +4,217 @@
 
 Set up a fully working local instance of Twenty CRM, expose the backend API using ngrok, and connect it to Zapier to trigger an automation (Zap) when a new Company record is created.
 
+This README provides a software-architect-level deep dive into the design, configuration, and integration pipeline, covering key decisions, rationale, challenges, and enhancement strategies for production use.
+
 ---
 
 ## ✅ Deliverables Checklist
 
-* [x] **Screencast Recording** — Showing full setup (pending upload)
-* [x] **Screenshots** — Included throughout this document
-* [x] **Documentation** — This README documents:
+*
 
-  * Setup process
-  * Configuration details
-  * Challenges & resolutions
-  * Improvement suggestions for production
+---
+
+## 🧠 System Architecture Overview
+
+Twenty CRM is a modular monorepo managed with Nx, consisting primarily of:
+
+* `twenty-server` — NestJS backend exposing GraphQL and REST APIs (Port `3000`)
+* `twenty-front` — Vite + React frontend (Port `3001`)
+* PostgreSQL & Redis dependencies for persistence and caching
+
+For this integration, only the **backend (port 3000)** needs exposure for external systems like Zapier. The frontend can remain local.
 
 ---
 
 ## 🏗️ Step-by-Step Breakdown
 
-### Part 1: Local Setup of Twenty CRM
+### 🧩 Part 1: Local Setup of Twenty CRM
 
-* **Cloned Repository**
+#### 🗂 Cloned Repository
 
-  * URL: [https://github.com/twentyhq/twenty](https://github.com/twentyhq/twenty)
-* **Installed Dependencies**
+```bash
+git clone https://github.com/twentyhq/twenty
+cd twenty
+```
 
-  * Frontend: `yarn install` in `packages/twenty-front`
-  * Backend: `yarn install` in `packages/twenty-back`
-* **Started Services**
+#### 📦 Installed Dependencies
 
-  * Backend: `npx nx run twenty-back:start`
-  * Frontend: `npx nx run twenty-front:start`
-* **Frontend URL:** [http://localhost:3001](http://localhost:3001)
-* **Backend URL:** [http://localhost:3000](http://localhost:3000)
-* **Initial Workspace:** Created via UI wizard after launch
+```bash
+yarn install
+```
 
-### Part 2: API Key Creation
+#### 🖥 Started Backend and Frontend
 
-* Navigated to: `Settings > APIs`
-* Created API key: **Zapier Integration Key**
-* Copied key for later use in Zapier
+```bash
+npx nx run twenty-server:start
+npx nx run twenty-front:start
+```
 
-### Part 3: Exposing Backend via ngrok
+* **Backend** (GraphQL + REST): `http://localhost:3000`
+* **Frontend**: `http://localhost:3001`
 
-* **Downloaded** ngrok for Windows
-* **Authenticated** with token:
+#### 🧪 Initial Workspace
 
-  ```sh
-  ngrok config add-authtoken <token>
-  ```
-* **Exposed Backend:**
-
-  ```sh
-  ngrok http 3000
-  ```
-* **Public URL:** `https://8877-77-125-33-48.ngrok-free.app`
-* **Updated Frontend `.env`**:
-
-  ```env
-  REACT_APP_SERVER_BASE_URL=https://8877-77-125-33-48.ngrok-free.app
-  ```
-
-### Part 4: Zapier Connection
-
-* Created Zapier account
-* Added a connection to the **Twenty App**
-* Provided:
-
-  * **ngrok backend URL**
-  * **API Key** from Twenty CRM
-* Verified with green check ✅
-
-### Part 5: Creating the Zap
-
-#### ✅ Trigger:
-
-* App: Twenty
-* Event: `Record Trigger`
-* Record Name: `Company`
-* Operation: `created`
-
-#### 🔄 Action:
-
-* App: Gmail
-* Event: Send Email
-* Body: `A new company named {{Company Name}} was created.`
-* Subject: `New Company Created`
-
-#### 🧠 Improvement:
-
-* Added **Filter by Zapier** step:
-
-  * Condition: Company Name → Exists
-  * Prevents emails from firing if name was blank
+After launch, created a workspace via the UI wizard to activate the backend functionality.
 
 ---
 
-## 📸 Key Screenshots
+### 🔐 Part 2: API Key Generation
 
-> **\[Screenshots Provided Separately or in Screencast]**
+Navigated to `Settings > APIs` inside the frontend dashboard, created a new API key named `Zapier Integration`, and securely copied it for use in Postman and Zapier.
 
-* Working local setup of Twenty CRM (Backend & Frontend)
-* ngrok public tunnel running
-* API Key screen
-* Zapier connection setup
-* Zap: Trigger and Action configured
+This key is used in `Authorization: Bearer <token>` headers for GraphQL access.
+
+---
+
+### 🌍 Part 3: Exposing Backend via ngrok
+
+### 🔧 Determine Which Port to Expose
+
+From system logs and architecture:
+
+* Backend runs on port `3000` (NestJS)
+* Frontend on port `3001`, **not needed for Zapier**
+
+✅ So we expose **`localhost:3000`**.
+
+### 📡 Setup ngrok
+
+```bash
+ngrok config add-authtoken <your-token>
+ngrok http 3000
+```
+
+Resulting URL:
+
+```env
+https://8877-77-125-33-48.ngrok-free.app
+```
+
+Used this for:
+
+* `REACT_APP_SERVER_BASE_URL` in frontend `.env`
+* Base URL in Zapier connection
+
+### ✅ Verification
+
+Tested using curl & Postman:
+
+```bash
+curl -X POST https://<ngrok-url>/graphql \
+  -H "Authorization: Bearer <api-key>" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ __typename }"}'
+```
+
+---
+
+### 📦 Why Docker Would Be Better
+
+Although this assignment used native yarn + ngrok setup, a **Docker-based approach** would be preferable in real-world environments:
+
+#### ✅ Advantages:
+
+* ✅ **Consistency**: Eliminate local dependency/version issues
+* ✅ **Isolation**: No port clashes, clean environment
+* ✅ **Networking**: Expose only required containers
+* ✅ **Scalability**: Easily switch to compose + cloud hosting (Railway, Render)
+* ✅ **CI/CD ready**: Simplifies DevOps pipelines
+
+---
+
+## 🔄 Part 4: Zapier Integration
+
+### 🔗 Step 1: Connect to Twenty App in Zapier
+
+1. Searched for the **Twenty** app *in Za*pier
+2. Created a new connection with:
+
+   * `API Key` from Part 2
+   * `ngrok` URL from Part 3
+3. Connection succeeded ✅
+
+---
+
+## ⚡ Part 5: Creating the Zap
+
+### 🟢 Trigger:
+
+* **App**: Twenty
+* **Event**: `Record Created`
+* **Schema**: `core`
+* **Table**: `company`
+
+Zapier pulled test record successfully.
+
+### 🔁 Filter (to improve UX):
+
+* **App**: Filter by Zapier
+* **Condition**: `Record Name → Exists`
+* Prevents firing on incomplete company records
+
+### ✉️ Action:
+
+* **App**: Gmail
+* **Event**: Send Email
+* **Subject**: `New Company Created`
+* **Body**:
+
+  > A new company named {{Record Name}} was added to Twenty CRM.
+
+---
+
+## 📸 Screenshots Summary
+
+* ✅ Local Twenty CRM (frontend & backend)
+* ✅ API Key creation
+* ✅ ngrok tunnel
+* ✅ Zapier connection config
+* ✅ Trigger + Filter + Gmail action
+* ✅ Zapier test: Email fired on valid company creation
+
+---
+
+## 🚧 Challenges & Resolutions
+
+| Challenge                            | Resolution                                             |
+| ------------------------------------ | ------------------------------------------------------ |
+| Frontend couldn't reach backend      | Updated `REACT_APP_SERVER_BASE_URL` to ngrok URL       |
+| Zap triggered before name was filled | Added `Filter by Zapier` → `Record Name Exists`        |
+| Couldn't access Twenty externally    | Confirmed port 3000 exposure with ngrok + auth headers |
 
 ---
 
 ## 🧠 What I Learned
 
-* How to run Twenty CRM locally and debug its dual-stack architecture
-* How ngrok integrates with API-based tools
-* How Zapier fetches dynamic field values and when to use filters
+* Navigating multi-package Nx workspaces
+* Aligning GraphQL schema access between backend & Zapier
+* Best practices for secure API key handling
+* How to enforce data quality at the automation layer (Zapier filter)
+* Benefits of Dockerization for scalable local dev
 
 ---
 
-## 🛠️ Challenges & Resolutions
+## 🏁 Recommendations for Production
 
-| Challenge                                     | Resolution                                             |
-| --------------------------------------------- | ------------------------------------------------------ |
-| Frontend failed to connect to backend         | Updated `.env` with ngrok URL                          |
-| Trigger fired before company name was filled  | Added `Filter by Zapier` for `Record Name Exists`      |
-| Couldn’t pull dynamic company name into Gmail | Ensured record creation completed before trigger fired |
-
----
-
-## 🚀 Production Recommendations
-
-* **Use a reverse proxy** (e.g., Nginx) and a static IP instead of ngrok
-* Add validation logic to prevent early firing on incomplete records
-* Use a managed environment (e.g., Vercel, Fly.io, Railway) for hosting
-* Secure API endpoints and rotate API keys
-* Set up logging and alerts for Zap errors
+| Area                 | Recommendation                                                     |
+| -------------------- | ------------------------------------------------------------------ |
+| Deployment           | Use Docker Compose / K8s / Render for stability                    |
+| API Security         | Rotate API keys, implement scopes/roles                            |
+| HTTPS                | Use custom domain and cert (via Cloudflare/Nginx) instead of ngrok |
+| Error Monitoring     | Integrate with Sentry or Datadog                                   |
+| Email Service        | Switch from Gmail to SES/SendGrid for scalable email delivery      |
+| Trigger Stability    | Use retry logic / polling fallback in Zapier                       |
+| Filtering/Validation | Add server-side validation hooks to prevent empty record names     |
 
 ---
 
-## 🧾 Summary
+## 📬 Summary
 
-This project demonstrates end-to-end integration of a self-hosted CRM system with a cloud automation platform. All steps were implemented, documented, and verified with working outputs.
+This project demonstrates end-to-end integration of a modern monorepo CRM (Twenty) with external automation tools (Zapier). All steps were completed with production-ready practices in mind — from configuration, tunneling, authentication, to automation triggers and filtering.
+
+> 🔐 Everything was designed with secure, reproducible, and testable architecture in mind.
 
 ---
 
-📩 *For the screencast and screenshots, refer to the provided video link or attached image files.*
+📁 *For full screenshots, video screencast, and **`.env`** configs, refer to the attached folder or screencast link.*
