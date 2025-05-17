@@ -8,12 +8,6 @@ This README provides a software-architect-level deep dive into the design, confi
 
 ---
 
-## ✅ Deliverables Checklist
-
-*
-
----
-
 ## 🧠 System Architecture Overview
 
 Twenty CRM is a modular monorepo managed with Nx, consisting primarily of:
