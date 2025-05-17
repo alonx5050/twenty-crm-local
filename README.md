@@ -121,20 +121,6 @@ curl -X POST https://<ngrok-url>/graphql \
 
 ---
 
-### 📦 Why Docker Would Be Better
-
-Although this assignment used native yarn + ngrok setup, a **Docker-based approach** would be preferable in real-world environments:
-
-#### ✅ Advantages:
-
-* ✅ **Consistency**: Eliminate local dependency/version issues
-* ✅ **Isolation**: No port clashes, clean environment
-* ✅ **Networking**: Expose only required containers
-* ✅ **Scalability**: Easily switch to compose + cloud hosting (Railway, Render)
-* ✅ **CI/CD ready**: Simplifies DevOps pipelines
-
----
-
 ## 🔄 Part 4: Zapier Integration
 
 ### 🔗 Step 1: Connect to Twenty App in Zapier
@@ -180,56 +166,10 @@ Zapier pulled test record successfully.
 ![Image](https://github.com/user-attachments/assets/eb822cd6-c3e8-42b0-ad35-226e72b676e9)
 ---
 
-## 📸 Screenshots Summary
-
-* ✅ Local Twenty CRM (frontend & backend)
-* ✅ API Key creation
-* ✅ ngrok tunnel
-* ✅ Zapier connection config
-* ✅ Trigger + Filter + Gmail action
-* ✅ Zapier test: Email fired on valid company creation
-
----
-
-## 🚧 Challenges & Resolutions
-
-| Challenge                            | Resolution                                             |
-| ------------------------------------ | ------------------------------------------------------ |
-| Frontend couldn't reach backend      | Updated `REACT_APP_SERVER_BASE_URL` to ngrok URL       |
-| Zap triggered before name was filled | Added `Filter by Zapier` → `Record Name Exists`        |
-| Couldn't access Twenty externally    | Confirmed port 3000 exposure with ngrok + auth headers |
-
----
-
-## 🧠 What I Learned
-
-* Navigating multi-package Nx workspaces
-* Aligning GraphQL schema access between backend & Zapier
-* Best practices for secure API key handling
-* How to enforce data quality at the automation layer (Zapier filter)
-* Benefits of Dockerization for scalable local dev
-
----
-
-## 🏁 Recommendations for Production
-
-| Area                 | Recommendation                                                     |
-| -------------------- | ------------------------------------------------------------------ |
-| Deployment           | Use Docker Compose / K8s / Render for stability                    |
-| API Security         | Rotate API keys, implement scopes/roles                            |
-| HTTPS                | Use custom domain and cert (via Cloudflare/Nginx) instead of ngrok |
-| Error Monitoring     | Integrate with Sentry or Datadog                                   |
-| Email Service        | Switch from Gmail to SES/SendGrid for scalable email delivery      |
-| Trigger Stability    | Use retry logic / polling fallback in Zapier                       |
-| Filtering/Validation | Add server-side validation hooks to prevent empty record names     |
-
----
 
 ## 📬 Summary
 
 This project demonstrates end-to-end integration of a modern monorepo CRM (Twenty) with external automation tools (Zapier). All steps were completed with production-ready practices in mind — from configuration, tunneling, authentication, to automation triggers and filtering.
-
-> 🔐 Everything was designed with secure, reproducible, and testable architecture in mind.
 
 ---
 
