@@ -140,6 +140,9 @@ Although this assignment used native yarn + ngrok setup, a **Docker-based approa
 
    * `API Key` from Part 2
    * `ngrok` URL from Part 3
+     
+![Image](https://github.com/user-attachments/assets/c691f723-a347-4e7d-94c0-44d5a9a7c43d)
+   
 3. Connection succeeded ✅
 
 ---
