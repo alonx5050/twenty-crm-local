@@ -57,7 +57,7 @@ npx nx run twenty-front:start
 
 After launch, created a workspace via the UI wizard to activate the backend functionality.
 
-https://github.com/alonx5050/twenty-crm-local/issues/2#issue-3066989573
+![Image](https://github.com/user-attachments/assets/a715c315-fc9c-4ae6-bb93-6fe3c9aeda03)
 
 ---
 
