@@ -83,6 +83,10 @@ From system logs and architecture:
 
 ### 📡 Setup ngrok
 
+first - sign up to ngrok and obtain your authtoken for the ngrok config. (you only need this once)
+
+![Image](https://github.com/user-attachments/assets/28d9c96a-fd5c-441c-a08d-82aca1eabd11)
+
 ```bash
 ngrok config add-authtoken <your-token>
 ngrok http 3000
