@@ -169,6 +169,7 @@ Zapier pulled test record successfully.
 
   > A new company named {{Record Name}} was added to Twenty CRM.
 
+![Image](https://github.com/user-attachments/assets/eb822cd6-c3e8-42b0-ad35-226e72b676e9)
 ---
 
 ## 📸 Screenshots Summary
