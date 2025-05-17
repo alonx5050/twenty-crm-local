@@ -67,6 +67,7 @@ Navigated to `Settings > APIs` inside the frontend dashboard, created a new API 
 
 This key is used in `Authorization: Bearer <token>` headers for GraphQL access.
 
+![Image](https://github.com/user-attachments/assets/d95b4471-afe1-48e2-a040-6c6db073cdb0)
 ---
 
 ### 🌍 Part 3: Exposing Backend via ngrok
