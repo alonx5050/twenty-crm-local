@@ -59,6 +59,10 @@ After launch, created a workspace via the UI wizard to activate the backend func
 
 ![Image](https://github.com/user-attachments/assets/a715c315-fc9c-4ae6-bb93-6fe3c9aeda03)
 
+After that , you can see you dashboard.
+
+![Image](https://github.com/user-attachments/assets/b68cb1e0-912b-41f5-a6cf-c3edea13733f)
+
 ---
 
 ### 🔐 Part 2: API Key Generation
