@@ -57,6 +57,8 @@ npx nx run twenty-front:start
 
 After launch, created a workspace via the UI wizard to activate the backend functionality.
 
+https://github.com/alonx5050/twenty-crm-local/issues/2#issue-3066989573
+
 ---
 
 ### 🔐 Part 2: API Key Generation
